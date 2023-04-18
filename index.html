@@ -13,7 +13,9 @@
 
 <body>
     <div class='max-w-4xl mx-auto'>
-        <Head title='Posts about oracle' />
+        <p>
+            Mail me at <a href="mailto:summonshr@gmail.com">summonshr@gmail.com</a> for any correction
+        </p>
         <h1 class="text-4xl font-bold">All posts</h1>
         <ul class="mt-4 font-sans">
                         <article class="relative group shadow mt-4 bg-gray-100">
@@ -25,9 +27,9 @@
                     <div class="mb-4 prose prose-slate prose-a:relative prose-a:z-10 dark:prose-dark line-clamp-2">
                         <div class='flow-root'>
                             <pre><code class="language-sql">CREATE TABLE orders (
-	id NUMBER(22, 4),
-	region VARCHAR2(20) NOT NULL,
-	customer_id NUMBER(22, 4) NOT NULL,
+	id NUMBER(22, 4), 
+	region VARCHAR2(20) NOT NULL, 
+	customer_id NUMBER(22, 4) NOT NULL, 
 	created_at DATE, updated_at date
 )
 PARTITION BY LIST(region) (
@@ -51,12 +53,12 @@ PARTITION BY LIST(region) (
                     <div class="mb-4 prose prose-slate prose-a:relative prose-a:z-10 dark:prose-dark line-clamp-2">
                         <div class='flow-root'>
                             <pre><code class="language-sql">CREATE TABLE orders (
-	id NUMBER(22, 4),
-	region VARCHAR2(20) NOT NULL,
-	customer_id NUMBER(22, 4) NOT NULL,
+	id NUMBER(22, 4), 
+	region VARCHAR2(20) NOT NULL, 
+	customer_id NUMBER(22, 4) NOT NULL, 
 	created_at DATE, updated_at date
 )
-PARTITION BY LIST(region)
+PARTITION BY LIST(region) 
 SUBPARTITION BY LIST(customer_id)
 SUBPARTITION TEMPLATE
 (
@@ -96,10 +98,10 @@ BEGIN
 		FOR I IN 1..4 LOOP
 			FOR J IN 1..4 LOOP
 				INSERT INTO orders VALUES (
-					ORDER_SEQUENCE.NEXTVAL,
-					regions(I),
+					ORDER_SEQUENCE.NEXTVAL, 
+					regions(I), 
 					J,
-					BEGIN_DATE,
+					BEGIN_DATE, 
 					BEGIN_DATE
 				);
 			END LOOP;
@@ -145,10 +147,10 @@ SUBPARTITION TEMPLATE
 ) NOLOGGING;
 </code></pre>
 <p>Create a sequence if needed</p>
-<pre><code class="language-sql">CREATE SEQUENCE ORDER_SEQ
-START WITH 1
-INCREMENT BY 1
-MAXVALUE 9999999999
+<pre><code class="language-sql">CREATE SEQUENCE ORDER_SEQ 
+START WITH 1 
+INCREMENT BY 1 
+MAXVALUE 9999999999 
 cache 1000
 nocycle;
 </code></pre>
@@ -198,15 +200,15 @@ END;
                 <div class="absolute -inset-y-2.5 -inset-x-4 md:-inset-y-4 md:-inset-x-6 sm:rounded-2xl"></div>
                 <div class="relative pt-4 px-4 pb-2">
                     <h3 class="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-200 capitalize">
-                        DBMS scheduler
+                        DBMS scheduler 
                     </h3>
                     <div class="mb-4 prose prose-slate prose-a:relative prose-a:z-10 dark:prose-dark line-clamp-2">
                         <div class='flow-root'>
                             <p>Create a procedure named DELETE_LAST_LOG and create the scheduler like below:</p>
-<pre><code class="language-sql">CREATE OR REPLACE PROCEDURE DELETE_LAST_LOG AS
-BEGIN
-	DELETE FROM LOGS
-	WHERE
+<pre><code class="language-sql">CREATE OR REPLACE PROCEDURE DELETE_LAST_LOG AS 
+BEGIN 
+	DELETE FROM LOGS 
+	WHERE 
 	CREATED_AT  &lt;= (SELECT MIN(CREATED_AT) FROM LOGS);
 	COMMIT;
 END;
