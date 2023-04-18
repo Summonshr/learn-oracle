@@ -236,6 +236,54 @@ END;
                     </div>
                 </div>
             </article>
+                        <article class="relative group shadow mt-4 bg-gray-100">
+                <div class="absolute -inset-y-2.5 -inset-x-4 md:-inset-y-4 md:-inset-x-6 sm:rounded-2xl"></div>
+                <div class="relative pt-4 px-4 pb-2">
+                    <h3 class="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-200 capitalize">
+                        FORALL and Bulk collect
+                    </h3>
+                    <div class="mb-4 prose prose-slate prose-a:relative prose-a:z-10 dark:prose-dark line-clamp-2">
+                        <div class='flow-root'>
+                            <pre><code class="language-sql">DECLARE
+region varchar2(5);
+TYPE regionType IS VARRAY(4) OF VARCHAR2(20);
+regions regionType := regionType('east','west','north','south');
+TYPE orderType IS TABLE OF orders%rowtype;
+orderData orderType := orderType();
+od orderType := orderType();
+orderIndex NUMBER(10) := 0;
+BEGIN
+	WHILE(BEGIN_DATE &lt; sysdate) LOOP
+		orderIndex := 0;
+		orderData := orderType();
+		SELECT BEGIN_DATE + 1 INTO BEGIN_DATE FROM dual;
+		FOR I IN 1..4 LOOP
+			region := regions(I);
+			FOR J IN 1..100 LOOP
+				orderIndex := orderIndex + 1;
+				orderData.extend(1);
+				orderData(orderIndex).id := ORDER_SEQ.NEXTVAL;
+				orderData(orderIndex).region := region;
+				orderData(orderIndex).customer_id := MOD(J, 4) + 1;
+				orderData(orderIndex).created_at := BEGIN_DATE;
+			END LOOP;
+		END LOOP;
+		COMMIT;
+		FORALL I IN 1..orderData.count
+			INSERT INTO orders VALUES (
+				orderData(I).id,
+				orderData(I).region,
+				orderData(I).customer_id,
+				orderData(I).created_at
+			);
+	END LOOP;
+END;
+</code></pre>
+
+                        </div>
+                    </div>
+                </div>
+            </article>
                     </ul>
     </div>
 </body>
