@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <title>All posts on oracle</title>
+    <link rel="stylesheet" href="/build/assets/app-eab486fd.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/sql.min.js" integrity="sha512-Peqqjy5bIeDold17e/HyMQqnfD3r1Bl64zCs6HM51YrJqToF/3fPwkvrdYvEFtdlKDOLPA8j9EcEjAVlUHKiaw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body>
+    <div class='max-w-4xl mx-auto'>
+        <Head title='Posts about oracle' />
+        <h1 class="text-4xl font-bold">All posts</h1>
+        <ul class="mt-4 font-sans">
+                        <article class="relative group shadow mt-4 bg-gray-100">
+                <div class="absolute -inset-y-2.5 -inset-x-4 md:-inset-y-4 md:-inset-x-6 sm:rounded-2xl"></div>
+                <div class="relative pt-4 px-4 pb-2">
+                    <h3 class="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-200 capitalize">
+                        List Partition in oracle
+                    </h3>
+                    <div class="mb-4 prose prose-slate prose-a:relative prose-a:z-10 dark:prose-dark line-clamp-2">
+                        <div class='flow-root'>
+                            <pre><code class="language-sql">CREATE TABLE orders (
+	id NUMBER(22, 4), 
+	region VARCHAR2(20) NOT NULL, 
+	customer_id NUMBER(22, 4) NOT NULL, 
+	created_at DATE, updated_at date
+)
+PARTITION BY LIST(region) (
+	PARTITION p_east VALUES ('east') tablespace tspe,
+	PARTITION p_north values('north') tablespace tspn,
+	PARTITION p_south values('south') tablespace tsps,
+	PARTITION p_west values('west') tablespace tspw
+);
+</code></pre>
+
+                        </div>
+                    </div>
+                </div>
+            </article>
+                        <article class="relative group shadow mt-4 bg-gray-100">
+                <div class="absolute -inset-y-2.5 -inset-x-4 md:-inset-y-4 md:-inset-x-6 sm:rounded-2xl"></div>
+                <div class="relative pt-4 px-4 pb-2">
+                    <h3 class="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-200 capitalize">
+                        Sub partitioning in oracle
+                    </h3>
+                    <div class="mb-4 prose prose-slate prose-a:relative prose-a:z-10 dark:prose-dark line-clamp-2">
+                        <div class='flow-root'>
+                            <pre><code class="language-sql">CREATE TABLE orders (
+	id NUMBER(22, 4), 
+	region VARCHAR2(20) NOT NULL, 
+	customer_id NUMBER(22, 4) NOT NULL, 
+	created_at DATE, updated_at date
+)
+PARTITION BY LIST(region) 
+SUBPARTITION BY LIST(customer_id)
+SUBPARTITION TEMPLATE
+(
+	SUBPARTITION p_east VALUES (1),
+	SUBPARTITION p_north values(2),
+	SUBPARTITION p_south values(3),
+	SUBPARTITION p_west values(4)
+)
+(
+	PARTITION p_east VALUES ('east') tablespace tspe,
+	PARTITION p_north values('north') tablespace tspn,
+	PARTITION p_south values('south') tablespace tsps,
+	PARTITION p_west values('west') tablespace tspw
+);
+</code></pre>
+
+                        </div>
+                    </div>
+                </div>
+            </article>
+                        <article class="relative group shadow mt-4 bg-gray-100">
+                <div class="absolute -inset-y-2.5 -inset-x-4 md:-inset-y-4 md:-inset-x-6 sm:rounded-2xl"></div>
+                <div class="relative pt-4 px-4 pb-2">
+                    <h3 class="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-200 capitalize">
+                        Test populating data
+                    </h3>
+                    <div class="mb-4 prose prose-slate prose-a:relative prose-a:z-10 dark:prose-dark line-clamp-2">
+                        <div class='flow-root'>
+                            <p>This is the slower way to do. But works if you just need to begin.</p>
+<pre><code class="language-sql">DECLARE
+BEGIN_DATE DATE := date'1900-04-01';
+TYPE regionType IS VARRAY(4) OF VARCHAR2(20);
+regions regionType := regionType('east','west','north','south');
+BEGIN
+	WHILE(BEGIN_DATE &lt; sysdate) LOOP
+		SELECT BEGIN_DATE + 1 INTO begin_DATE FROM dual;
+		FOR I IN 1..4 LOOP
+			FOR J IN 1..4 LOOP
+				INSERT INTO orders VALUES (
+					ORDER_SEQUENCE.NEXTVAL, 
+					regions(I), 
+					J,
+					BEGIN_DATE, 
+					BEGIN_DATE
+				);
+			END LOOP;
+		END LOOP;
+		COMMIT;
+	END LOOP;
+END;
+</code></pre>
+
+                        </div>
+                    </div>
+                </div>
+            </article>
+                        <article class="relative group shadow mt-4 bg-gray-100">
+                <div class="absolute -inset-y-2.5 -inset-x-4 md:-inset-y-4 md:-inset-x-6 sm:rounded-2xl"></div>
+                <div class="relative pt-4 px-4 pb-2">
+                    <h3 class="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-200 capitalize">
+                        Millions of rows insert per minute
+                    </h3>
+                    <div class="mb-4 prose prose-slate prose-a:relative prose-a:z-10 dark:prose-dark line-clamp-2">
+                        <div class='flow-root'>
+                            <p>The last version was very slow. This one does the magic. Around 18 million rows inserted in mere 5 minutes in just 2gb ram.
+Create a table with nologging.</p>
+<pre><code class="language-sql">CREATE TABLE orders (
+id NUMBER(10),
+region varchar2(5),
+customer_id NUMBER(3),
+created_at DATE
+) PARTITION BY LIST(region)
+SUBPARTITION BY LIST (customer_id)
+SUBPARTITION TEMPLATE
+(
+	subpartition p1 values(1),
+	subpartition p2 values(2),
+	subpartition p3 values(3),
+	subpartition p4 values(4)
+)
+(
+	PARTITION p_east values('east') tablespace tspe,
+	PARTITION p_west values('west') tablespace tspw,
+	PARTITION p_north values('north') tablespace tspn,
+	PARTITION p_south values('south') tablespace tsps
+) NOLOGGING;
+</code></pre>
+<p>Create a sequence if needed</p>
+<pre><code class="language-sql">CREATE SEQUENCE ORDER_SEQ 
+START WITH 1 
+INCREMENT BY 1 
+MAXVALUE 9999999999 
+cache 1000
+nocycle;
+</code></pre>
+<p>Insert procedure looks something like this.</p>
+<pre><code class="language-sql">CREATE OR REPLACE PROCEDURE INSERTER AS
+BEGIN_DATE DATE := date'1900-04-01';
+region varchar2(5);
+TYPE regionType IS VARRAY(4) OF VARCHAR2(20);
+regions regionType := regionType('east','west','north','south');
+TYPE orderType IS TABLE OF orders%rowtype;
+orderData orderType := orderType();
+od orderType := orderType();
+orderIndex NUMBER(10) := 0;
+BEGIN
+	WHILE(BEGIN_DATE &lt; sysdate) LOOP
+		orderIndex := 0;
+		orderData := orderType();
+		SELECT BEGIN_DATE + 1 INTO BEGIN_DATE FROM dual;
+		FOR I IN 1..4 LOOP
+			region := regions(I);
+			FOR J IN 1..100 LOOP
+				orderIndex := orderIndex + 1;
+				orderData.extend(1);
+				orderData(orderIndex).id := ORDER_SEQ.NEXTVAL;
+				orderData(orderIndex).region := region;
+				orderData(orderIndex).customer_id := MOD(J, 4) + 1;
+				orderData(orderIndex).created_at := BEGIN_DATE;
+			END LOOP;
+		END LOOP;
+		COMMIT;
+		FORALL I IN 1..orderData.count
+			INSERT /*+ APPEND PARALLEL(orders, 8) */ INTO orders VALUES (
+				orderData(I).id,
+				orderData(I).region,
+				orderData(I).customer_id,
+				orderData(I).created_at
+			);
+	END LOOP;
+END;
+</code></pre>
+
+                        </div>
+                    </div>
+                </div>
+            </article>
+                        <article class="relative group shadow mt-4 bg-gray-100">
+                <div class="absolute -inset-y-2.5 -inset-x-4 md:-inset-y-4 md:-inset-x-6 sm:rounded-2xl"></div>
+                <div class="relative pt-4 px-4 pb-2">
+                    <h3 class="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-200 capitalize">
+                        DBMS scheduler 
+                    </h3>
+                    <div class="mb-4 prose prose-slate prose-a:relative prose-a:z-10 dark:prose-dark line-clamp-2">
+                        <div class='flow-root'>
+                            <p>Create a procedure named DELETE_LAST_LOG and create the scheduler like below:</p>
+<pre><code class="language-sql">CREATE OR REPLACE PROCEDURE DELETE_LAST_LOG AS 
+BEGIN 
+	DELETE FROM LOGS 
+	WHERE 
+	CREATED_AT  &lt;= (SELECT MIN(CREATED_AT) FROM LOGS);
+	COMMIT;
+END;
+</code></pre>
+<p>Creating a job is this simple.</p>
+<pre><code class="language-sql">BEGIN
+  DBMS_SCHEDULER.create_job(
+ 	job_name=&gt; 'DELETE_LOGS_DAILY',
+ 	job_type=&gt; 'STORED_PROCEDURE',
+ 	job_action=&gt; 'DELETE_LAST_LOG',
+ 	start_date=&gt; SYSTIMESTAMP,
+ 	repeat_interval=&gt; 'FREQ=DAILY;INTERVAL=1',
+ 	enabled=&gt; true
+  );
+END;
+</code></pre>
+<p>Other places to use scheduler</p>
+<ul>
+<li>To mark boolean columns as per conditions</li>
+<li>To generate summary reports</li>
+<li>Scheduled backups of data</li>
+</ul>
+
+                        </div>
+                    </div>
+                </div>
+            </article>
+                    </ul>
+    </div>
+</body>
+<script>
+    document.querySelectorAll('div code').forEach(el => {
+        hljs.highlightElement(el, {
+            language: 'pgsql'
+        });
+    });
+</script>
+
+</html>
