@@ -247,7 +247,7 @@ ORDER BY
 <p>Total rows: 37 million
 RAM: 2GB</p>
 </blockquote>
-<p>Total time: <strong>4.5 second</strong></p>
+<p>Total time: <strong>4.9 second</strong></p>
 <pre><code class="language-sql">SELECT  region, customer_id, count(1) FROM orders 
 GROUP BY region, customer_id;
 </code></pre>
@@ -255,12 +255,12 @@ GROUP BY region, customer_id;
 <pre><code class="language-sql">SELECT /*+ PARALLEL */ region, customer_id, count(1) FROM orders 
 GROUP BY region, customer_id;
 </code></pre>
-<p>Total time: <strong>2.1 second</strong></p>
-<pre><code class="language-sql">SELECT /*+ PARALLEL(ORDERS, 8) */ region, customer_id, count(1) FROM orders 
+<p>Total time: <strong>1.1 second</strong></p>
+<pre><code class="language-sql">SELECT /*+ PARALLEL(ORDERS) */ region, customer_id, count(1) FROM orders 
 GROUP BY region, customer_id;
 </code></pre>
-<p>Total time: <strong>2.7 seconds</strong></p>
-<pre><code class="language-sql">SELECT  /*+ PARALLEL(ORDERS, 4) */ region, customer_id, count(1) FROM orders 
+<p>Total time: <strong>0.8 seconds</strong></p>
+<pre><code class="language-sql">SELECT /*+ PARALLEL(ORDERS,8) */region, customer_id, count(1) FROM orders
 GROUP BY region, customer_id;
 </code></pre>
 <p>Do not go beyond total number of cores available.</p>
