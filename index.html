@@ -17,6 +17,7 @@
         <div class="flex flex-wrap justify-between">
             <div class="w-1/5 mt-16 bg-gray-200 p-2 flex flex-col justify-between">
                 <ul>
+                                        <li class="mt-2 text-blue-950"><a href="#daily-average-order-amounts-by-customer-for-certain-time-range">Daily average order amounts by customer for certain time range</a></li>
                                         <li class="mt-2 text-blue-950"><a href="#parallel-effectiveness-in-select-operation">PARALLEL effectiveness in select operation </a></li>
                                         <li class="mt-2 text-blue-950"><a href="#updating-large-sets-of-data">Updating large sets of data</a></li>
                                         <li class="mt-2 text-blue-950"><a href="#forall-and-bulk-collect">FORALL and Bulk collect</a></li>
@@ -33,6 +34,34 @@
             <div class="p-2 w-4/5 h-screen overflow-y-scroll overflow-x-hidden">
                 <h1 class="text-4xl font-bold">All posts</h1>
                 <ul class="mt-4 font-sans ">
+                                        <article class="relative group shadow mt-4 bg-gray-100" id="daily-average-order-amounts-by-customer-for-certain-time-range">
+                        <div class="absolute -inset-y-2.5 -inset-x-4 md:-inset-y-4 md:-inset-x-6 sm:rounded-2xl"></div>
+                        <div class="relative pt-4 px-4 pb-2">
+                            <h3 class="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-200 capitalize">
+                                Daily average order amounts by customer for certain time range
+                            </h3>
+                            <div class="mb-4 prose prose-slate prose-a:relative prose-a:z-10 dark:prose-dark line-clamp-2">
+                                <div class='flow-root'>
+                                    <pre><code class="language-sql">WITH A AS (
+	SELECT 
+	CUSTOMER_ID,
+	min(id) id,
+	created_at,
+	sum(total_amount) total_amount	
+	FROM orders WHERE customer_id = '1' 
+	AND region = 'east' 
+	AND CREATED_AT BETWEEN date'2023-01-01' 
+	AND sysdate GROUP BY customer_Id,created_at
+)
+SELECT A.*, sum(total_amount) OVER (PARTITION BY created_at ORDER BY id) 
+/row_number() OVER (PARTITION BY created_at ORDER BY id) average 
+FROM A;
+</code></pre>
+
+                                </div>
+                            </div>
+                        </div>
+                    </article>
                                         <article class="relative group shadow mt-4 bg-gray-100" id="parallel-effectiveness-in-select-operation">
                         <div class="absolute -inset-y-2.5 -inset-x-4 md:-inset-y-4 md:-inset-x-6 sm:rounded-2xl"></div>
                         <div class="relative pt-4 px-4 pb-2">
