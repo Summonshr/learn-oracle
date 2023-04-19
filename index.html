@@ -17,6 +17,7 @@
         <div class="flex flex-wrap justify-between">
             <div class="w-1/5 mt-16 bg-gray-200 p-2 flex flex-col justify-between">
                 <ul>
+                                        <li class="mt-2 text-blue-950"><a href="#parallel-effectiveness-in-select-operation">PARALLEL effectiveness in select operation </a></li>
                                         <li class="mt-2 text-blue-950"><a href="#updating-large-sets-of-data">Updating large sets of data</a></li>
                                         <li class="mt-2 text-blue-950"><a href="#forall-and-bulk-collect">FORALL and Bulk collect</a></li>
                                         <li class="mt-2 text-blue-950"><a href="#dbms-scheduler">DBMS scheduler </a></li>
@@ -32,6 +33,36 @@
             <div class="p-2 w-4/5 h-screen overflow-y-scroll overflow-x-hidden">
                 <h1 class="text-4xl font-bold">All posts</h1>
                 <ul class="mt-4 font-sans ">
+                                        <article class="relative group shadow mt-4 bg-gray-100" id="parallel-effectiveness-in-select-operation">
+                        <div class="absolute -inset-y-2.5 -inset-x-4 md:-inset-y-4 md:-inset-x-6 sm:rounded-2xl"></div>
+                        <div class="relative pt-4 px-4 pb-2">
+                            <h3 class="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-200 capitalize">
+                                PARALLEL effectiveness in select operation 
+                            </h3>
+                            <div class="mb-4 prose prose-slate prose-a:relative prose-a:z-10 dark:prose-dark line-clamp-2">
+                                <div class='flow-root'>
+                                    <blockquote>
+<p>Total rows: 37 million
+RAM: 2GB</p>
+</blockquote>
+<p>Total time: <strong>4.5 second</strong></p>
+<pre><code class="language-sql">SELECT  region, customer_id, count(1) FROM orders GROUP BY region, customer_id;
+</code></pre>
+<p>Total time: <strong>2.5 second</strong></p>
+<pre><code class="language-sql">SELECT /*+ PARALLEL */ region, customer_id, count(1) FROM orders GROUP BY region, customer_id;
+</code></pre>
+<p>Total time: <strong>2.1 second</strong></p>
+<pre><code class="language-sql">SELECT /*+ PARALLEL(ORDERS, 8) */ region, customer_id, count(1) FROM orders GROUP BY region, customer_id;
+</code></pre>
+<p>Total time: <strong>2.7 seconds</strong></p>
+<pre><code class="language-sql">SELECT  /*+ PARALLEL(ORDERS, 4) */ region, customer_id, count(1) FROM orders GROUP BY region, customer_id;
+</code></pre>
+<p>Do not go beyond total number of cores available.</p>
+
+                                </div>
+                            </div>
+                        </div>
+                    </article>
                                         <article class="relative group shadow mt-4 bg-gray-100" id="updating-large-sets-of-data">
                         <div class="absolute -inset-y-2.5 -inset-x-4 md:-inset-y-4 md:-inset-x-6 sm:rounded-2xl"></div>
                         <div class="relative pt-4 px-4 pb-2">
