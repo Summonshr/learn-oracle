@@ -17,6 +17,7 @@
         <div class="flex flex-wrap justify-between">
             <div class="w-1/5 mt-16 bg-gray-200 p-2 flex flex-col justify-between">
                 <ul>
+                                        <li class="mt-2 text-blue-950"><a href="#updating-large-sets-of-data">Updating large sets of data</a></li>
                                         <li class="mt-2 text-blue-950"><a href="#forall-and-bulk-collect">FORALL and Bulk collect</a></li>
                                         <li class="mt-2 text-blue-950"><a href="#dbms-scheduler">DBMS scheduler </a></li>
                                         <li class="mt-2 text-blue-950"><a href="#millions-of-rows-insert-per-minute">Millions of rows insert per minute</a></li>
@@ -31,6 +32,118 @@
             <div class="p-2 w-4/5 h-screen overflow-y-scroll overflow-x-hidden">
                 <h1 class="text-4xl font-bold">All posts</h1>
                 <ul class="mt-4 font-sans ">
+                                        <article class="relative group shadow mt-4 bg-gray-100" id="updating-large-sets-of-data">
+                        <div class="absolute -inset-y-2.5 -inset-x-4 md:-inset-y-4 md:-inset-x-6 sm:rounded-2xl"></div>
+                        <div class="relative pt-4 px-4 pb-2">
+                            <h3 class="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-200 capitalize">
+                                Updating large sets of data
+                            </h3>
+                            <div class="mb-4 prose prose-slate prose-a:relative prose-a:z-10 dark:prose-dark line-clamp-2">
+                                <div class='flow-root'>
+                                    <p>RAM: 2GB
+Rows:
+It took 9 minutes to update all rows considering indexing has been added on created_at column.</p>
+<pre><code class="language-sql">DECLARE
+MIN_DATE DATE:= date'1900-01-01';
+BEGIN
+	SELECT min(created_at) INTO min_date FROM orders;
+	while(min_date &lt; sysdate) loop
+		UPDATE orders SET total_amount = MOD(ID, 1000000)*customer_id 
+		WHERE created_at = min_date;
+		COMMIT;
+		SELECT MIN_DATE + 1 INTO MIN_DATE FROM dual;
+	END LOOP;
+END;
+</code></pre>
+<p>It took to just 5 and half minutes to update after use of NOLOGGING and index in created_at column.</p>
+<pre><code class="language-sql">DECLARE
+MIN_DATE DATE:= date'1900-01-01';
+BEGIN
+	SELECT min(created_at) INTO min_date FROM orders;
+	while(min_date &lt; sysdate) loop
+		UPDATE /*+ NOLOGGING */ orders 
+		SET total_amount = MOD(ID, 1000000)*customer_id 
+		WHERE created_at = min_date;
+		COMMIT;
+		SELECT MIN_DATE + 1 INTO MIN_DATE FROM dual;
+	END LOOP;
+END;
+</code></pre>
+<p>Now let's add parallel hint on the query.</p>
+<pre><code class="language-sql">DECLARE
+MIN_DATE DATE:= date'1900-01-01';
+BEGIN
+	SELECT min(created_at) INTO min_date FROM orders;
+	while(min_date &lt; sysdate) loop
+		UPDATE /*+ NOLOGGING */ orders 
+		SET total_amount = MOD(ID, 1000000) * customer_id
+		WHERE created_at = min_date;
+		COMMIT;
+		SELECT MIN_DATE + 1 INTO MIN_DATE FROM dual;
+	END LOOP;
+END;
+</code></pre>
+<p>No significant improvement here. Rather it took 1 minute more.
+Now let's try with bind variable, will remove parallel hint and see if it does any good.</p>
+<pre><code class="language-sql">DECLARE
+MIN_DATE DATE:= date'1900-01-01';
+BEGIN
+	SELECT min(created_at) INTO min_date FROM orders;
+	while(min_date &lt; sysdate) loop
+		EXECUTE IMMEDIATE 
+		'UPDATE /*+ NOLOGGING */ orders SET total_amount = 9 WHERE created_at = :1' 
+		USING min_date;
+		COMMIT;
+		SELECT MIN_DATE + 1 INTO MIN_DATE FROM dual;
+	END LOOP;
+END;
+</code></pre>
+<p>It's unbeareably slow. I killed the session before it could complete.
+Now we know table is partitioned by region and further by customer_id, which means it can be used which could make updates faster.</p>
+<pre><code class="language-sql">DECLARE
+MIN_DATE DATE:= date'1900-04-01';
+CURSOR c1 IS SELECT * FROM REGIONSANDCUSTOMER;
+c1_data c1%rowtype;
+BEGIN
+	OPEN c1;
+	LOOP
+		MIN_DATE := date'1900-04-01';
+		FETCH c1 INTO c1_data;
+		EXIT WHEN c1%NOTFOUND;
+		WHILE(min_date &lt; sysdate) loop
+			UPDATE /*+ NOLOGGING */ ORDERS SET TOTAL_AMOUNT = 1 
+				WHERE region = c1_data.region 
+				AND customer_id = c1_data.customer_id 
+				AND created_at = min_date;	
+			SELECT MIN_DATE + 1 INTO MIN_DATE FROM dual;
+		END LOOP;
+		COMMIT;	
+	END LOOP;
+	CLOSE C1;
+END;
+</code></pre>
+<p>This was much slower as it was firing 16 times much query that normally it would. Almost 10 minutes, this is not good. Time for bulk collect and forall .</p>
+<pre><code class="language-sql">DECLARE
+CURSOR c1 IS SELECT rowid FROM orders;
+TYPE c1_table IS TABLE OF c1%rowtype;
+c1_data c1_table;
+BEGIN
+	OPEN c1;
+	LOOP
+	FETCH c1 BULK COLLECT INTO  c1_data LIMIT 1000;
+	EXIT WHEN c1_data.count = 0;
+		FORALL i IN 1..c1_data.count
+			UPDATE orders SET total_amount = 4 WHERE rowid IN c1_data(i).rowid;
+	COMMIT;
+	END LOOP;
+END;
+</code></pre>
+<p>Finished just under seven minutes. But still not good enough.</p>
+
+                                </div>
+                            </div>
+                        </div>
+                    </article>
                                         <article class="relative group shadow mt-4 bg-gray-100" id="forall-and-bulk-collect">
                         <div class="absolute -inset-y-2.5 -inset-x-4 md:-inset-y-4 md:-inset-x-6 sm:rounded-2xl"></div>
                         <div class="relative pt-4 px-4 pb-2">
