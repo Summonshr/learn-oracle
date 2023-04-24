@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
     <title>All posts on </title>
-    <link rel="stylesheet" href="../assets/app.css">
+    <link rel="stylesheet" href="/assets/app.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/sql.min.js" integrity="sha512-Peqqjy5bIeDold17e/HyMQqnfD3r1Bl64zCs6HM51YrJqToF/3fPwkvrdYvEFtdlKDOLPA8j9EcEjAVlUHKiaw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -239,7 +239,7 @@ ORDER BY
                         <div class="absolute -inset-y-2.5 -inset-x-4 md:-inset-y-4 md:-inset-x-6 sm:rounded-2xl"></div>
                         <div class="relative pt-4 px-4 pb-2">
                             <h3 class="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-200 capitalize">
-                                PARALLEL effectiveness in select operation 
+                                PARALLEL effectiveness in select operation
                             </h3>
                             <div class="mb-4 prose prose-slate prose-a:relative prose-a:z-10 dark:prose-dark line-clamp-2">
                                 <div class='flow-root'>
@@ -248,15 +248,15 @@ ORDER BY
 RAM: 2GB</p>
 </blockquote>
 <p>Total time: <strong>4.9 second</strong></p>
-<pre><code class="language-sql">SELECT  region, customer_id, count(1) FROM orders 
+<pre><code class="language-sql">SELECT  region, customer_id, count(1) FROM orders
 GROUP BY region, customer_id;
 </code></pre>
 <p>Total time: <strong>2.5 second</strong></p>
-<pre><code class="language-sql">SELECT /*+ PARALLEL */ region, customer_id, count(1) FROM orders 
+<pre><code class="language-sql">SELECT /*+ PARALLEL */ region, customer_id, count(1) FROM orders
 GROUP BY region, customer_id;
 </code></pre>
 <p>Total time: <strong>1.1 second</strong></p>
-<pre><code class="language-sql">SELECT /*+ PARALLEL(ORDERS) */ region, customer_id, count(1) FROM orders 
+<pre><code class="language-sql">SELECT /*+ PARALLEL(ORDERS) */ region, customer_id, count(1) FROM orders
 GROUP BY region, customer_id;
 </code></pre>
 <p>Total time: <strong>0.8 seconds</strong></p>
@@ -287,7 +287,7 @@ MIN_DATE DATE:= date'1900-01-01';
 BEGIN
 	SELECT min(created_at) INTO min_date FROM orders;
 	while(min_date &lt; sysdate) loop
-		UPDATE orders SET total_amount = MOD(ID, 1000000)*customer_id 
+		UPDATE orders SET total_amount = MOD(ID, 1000000)*customer_id
 		WHERE created_at = min_date;
 		COMMIT;
 		SELECT MIN_DATE + 1 INTO MIN_DATE FROM dual;
@@ -300,8 +300,8 @@ MIN_DATE DATE:= date'1900-01-01';
 BEGIN
 	SELECT min(created_at) INTO min_date FROM orders;
 	while(min_date &lt; sysdate) loop
-		UPDATE /*+ NOLOGGING */ orders 
-		SET total_amount = MOD(ID, 1000000)*customer_id 
+		UPDATE /*+ NOLOGGING */ orders
+		SET total_amount = MOD(ID, 1000000)*customer_id
 		WHERE created_at = min_date;
 		COMMIT;
 		SELECT MIN_DATE + 1 INTO MIN_DATE FROM dual;
@@ -314,7 +314,7 @@ MIN_DATE DATE:= date'1900-01-01';
 BEGIN
 	SELECT min(created_at) INTO min_date FROM orders;
 	while(min_date &lt; sysdate) loop
-		UPDATE /*+ NOLOGGING */ orders 
+		UPDATE /*+ NOLOGGING */ orders
 		SET total_amount = MOD(ID, 1000000) * customer_id
 		WHERE created_at = min_date;
 		COMMIT;
@@ -329,8 +329,8 @@ MIN_DATE DATE:= date'1900-01-01';
 BEGIN
 	SELECT min(created_at) INTO min_date FROM orders;
 	while(min_date &lt; sysdate) loop
-		EXECUTE IMMEDIATE 
-		'UPDATE /*+ NOLOGGING */ orders SET total_amount = 9 WHERE created_at = :1' 
+		EXECUTE IMMEDIATE
+		'UPDATE /*+ NOLOGGING */ orders SET total_amount = 9 WHERE created_at = :1'
 		USING min_date;
 		COMMIT;
 		SELECT MIN_DATE + 1 INTO MIN_DATE FROM dual;
@@ -350,13 +350,13 @@ BEGIN
 		FETCH c1 INTO c1_data;
 		EXIT WHEN c1%NOTFOUND;
 		WHILE(min_date &lt; sysdate) loop
-			UPDATE /*+ NOLOGGING */ ORDERS SET TOTAL_AMOUNT = 1 
-				WHERE region = c1_data.region 
-				AND customer_id = c1_data.customer_id 
-				AND created_at = min_date;	
+			UPDATE /*+ NOLOGGING */ ORDERS SET TOTAL_AMOUNT = 1
+				WHERE region = c1_data.region
+				AND customer_id = c1_data.customer_id
+				AND created_at = min_date;
 			SELECT MIN_DATE + 1 INTO MIN_DATE FROM dual;
 		END LOOP;
-		COMMIT;	
+		COMMIT;
 	END LOOP;
 	CLOSE C1;
 END;
@@ -438,15 +438,15 @@ END;
                         <div class="absolute -inset-y-2.5 -inset-x-4 md:-inset-y-4 md:-inset-x-6 sm:rounded-2xl"></div>
                         <div class="relative pt-4 px-4 pb-2">
                             <h3 class="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-200 capitalize">
-                                DBMS scheduler 
+                                DBMS scheduler
                             </h3>
                             <div class="mb-4 prose prose-slate prose-a:relative prose-a:z-10 dark:prose-dark line-clamp-2">
                                 <div class='flow-root'>
                                     <p>Create a procedure named DELETE_LAST_LOG and create the scheduler like below:</p>
-<pre><code class="language-sql">CREATE OR REPLACE PROCEDURE DELETE_LAST_LOG AS 
-BEGIN 
-	DELETE FROM LOGS 
-	WHERE 
+<pre><code class="language-sql">CREATE OR REPLACE PROCEDURE DELETE_LAST_LOG AS
+BEGIN
+	DELETE FROM LOGS
+	WHERE
 	CREATED_AT  &lt;= (SELECT MIN(CREATED_AT) FROM LOGS);
 	COMMIT;
 END;
@@ -506,10 +506,10 @@ SUBPARTITION TEMPLATE
 ) NOLOGGING;
 </code></pre>
 <p>Create a sequence if needed</p>
-<pre><code class="language-sql">CREATE SEQUENCE ORDER_SEQ 
-START WITH 1 
-INCREMENT BY 1 
-MAXVALUE 9999999999 
+<pre><code class="language-sql">CREATE SEQUENCE ORDER_SEQ
+START WITH 1
+INCREMENT BY 1
+MAXVALUE 9999999999
 cache 1000
 nocycle;
 </code></pre>
@@ -574,10 +574,10 @@ BEGIN
 		FOR I IN 1..4 LOOP
 			FOR J IN 1..4 LOOP
 				INSERT INTO orders VALUES (
-					ORDER_SEQUENCE.NEXTVAL, 
-					regions(I), 
+					ORDER_SEQUENCE.NEXTVAL,
+					regions(I),
 					J,
-					BEGIN_DATE, 
+					BEGIN_DATE,
 					BEGIN_DATE
 				);
 			END LOOP;
@@ -600,12 +600,12 @@ END;
                             <div class="mb-4 prose prose-slate prose-a:relative prose-a:z-10 dark:prose-dark line-clamp-2">
                                 <div class='flow-root'>
                                     <pre><code class="language-sql">CREATE TABLE orders (
-	id NUMBER(22, 4), 
-	region VARCHAR2(20) NOT NULL, 
-	customer_id NUMBER(22, 4) NOT NULL, 
+	id NUMBER(22, 4),
+	region VARCHAR2(20) NOT NULL,
+	customer_id NUMBER(22, 4) NOT NULL,
 	created_at DATE, updated_at date
 )
-PARTITION BY LIST(region) 
+PARTITION BY LIST(region)
 SUBPARTITION BY LIST(customer_id)
 SUBPARTITION TEMPLATE
 (
@@ -635,9 +635,9 @@ SUBPARTITION TEMPLATE
                             <div class="mb-4 prose prose-slate prose-a:relative prose-a:z-10 dark:prose-dark line-clamp-2">
                                 <div class='flow-root'>
                                     <pre><code class="language-sql">CREATE TABLE orders (
-	id NUMBER(22, 4), 
-	region VARCHAR2(20) NOT NULL, 
-	customer_id NUMBER(22, 4) NOT NULL, 
+	id NUMBER(22, 4),
+	region VARCHAR2(20) NOT NULL,
+	customer_id NUMBER(22, 4) NOT NULL,
 	created_at DATE, updated_at date
 )
 PARTITION BY LIST(region) (
