@@ -1,1 +1,41 @@
-For laravel
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <title>All posts on oracle</title>
+    <link rel="stylesheet" href="/assets/app.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/sql.min.js" integrity="sha512-Peqqjy5bIeDold17e/HyMQqnfD3r1Bl64zCs6HM51YrJqToF/3fPwkvrdYvEFtdlKDOLPA8j9EcEjAVlUHKiaw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body>
+        <div class='max-w-7xl mx-auto'>
+
+        <div class="flex flex-wrap justify-between">
+            <div class="w-1/5 mt-16 bg-gray-200 p-2 flex flex-col justify-between">
+                <ul>
+                                    </ul>
+                <p>
+                    Mail me at <a href="mailto:summonshr@gmail.com">summonshr@gmail.com</a> for any corrections.
+                </p>
+            </div>
+            <div class="p-2 w-4/5 h-screen overflow-y-scroll overflow-x-hidden">
+                <h1 class="text-4xl font-bold">All posts</h1>
+                <ul class="mt-4 font-sans ">
+                                    </ul>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    document.querySelectorAll('div code').forEach(el => {
+        hljs.highlightElement(el, {
+            language: 'pgsql'
+        });
+    });
+</script>
+
+</html>
